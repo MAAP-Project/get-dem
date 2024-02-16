@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-basedir=$( cd "$(dirname "$0")" ; pwd -P )
-conda config --set solver libmamba
+set -eou pipefail
 
-conda env create -f ${basedir}/environment.yaml
+basedir=$(dirname "$(readlink -f "$0")")
 
+conda env create --solver libmamba -f "${basedir}"/environment.yml

@@ -1,34 +1,33 @@
-# get-dem
-Take a bounding box and output a geotiff DEM.
+# Get DEM
+
+Take a bounding box and output a GeoTIFF DEM, optionally performing intense,
+multi-core computations on it.
 
 ## Introduction
-This is a thin wrapper around `sardem`: https://github.com/scottstanie/sardem
 
-The wrapper is designed for use with the MAAP project; it is meant
-to exercise the MAAP processing pipeline.
+This is a thin wrapper around `sardem`: <https://github.com/scottstanie/sardem>
 
-The source DEM is hardcoded to be the Copernicus DEM,
-which is fetched from the AWS Open Data registry.
-See: https://registry.opendata.aws/copernicus-dem/
+The wrapper is designed for use with the MAAP project.  It is meant to exercise
+the MAAP processing pipeline.
 
-The code will fetch the necessary DEM tiles, stitch them together with GDAL,
-and create a single geotiff DEM in the `out_dir` directory, named `dem.tif`.
+The source DEM is hardcoded to be the Copernicus DEM, which is fetched from the
+AWS Open Data registry.  See: <https://registry.opendata.aws/copernicus-dem/>
 
-If the `--compute` flag is included, it will open the generated dem.tif
-file and do compute-intensive, multi-core linear algebra computations
-on that DEM raster. There are no changes made to the dem.tif; this command
-is simply for benchmarking compute. These computations use NumPy's
-linear algebra module, which uses all available CPU cores.
+The code will fetch the necessary DEM tiles, stitch them together with GDAL, and
+create a single GeoTIFF DEM in the `out_dir` directory, named `dem.tif`.
 
-Example cmd line calls:
+If the `--compute` flag is included, it will open the generated file and do
+compute-intensive, multi-core linear algebra computations on that DEM raster.
+There are no changes made to the file; this command is simply for benchmarking
+compute.  These computations use NumPy's linear algebra module, which uses all
+available CPU cores.
 
-```
-python get_dem.py 
-    --bbox -156 18.8 -154.7 20.3  # bounding box: [left  bottom  right top]
-    --out_dir output
+Example command-line calls:
 
-python get_dem.py 
-    --bbox -156 18.8 -154.7 20.3  # bounding box: [left  bottom  right top]
-    --compute  # flag to have the compute node perform intense, multi-core computations
-    --out_dir output
+```plain
+# bounding box: left bottom right top
+python get_dem.py --bbox -156 18.8 -154.7 20.3 --output-dir output
+
+# --compute is a flag to have the compute node perform intense, multi-core computations
+python get_dem.py --bbox -156 18.8 -154.7 20.3 --compute --output-dir output
 ```

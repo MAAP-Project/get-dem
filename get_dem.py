@@ -1,106 +1,167 @@
-import os
 import argparse
-import subprocess
-from osgeo import gdal
-import numpy as np
+import os
+import sys
 from time import time
 
-__version__ = "0.2.0"
+import numpy as np
+from osgeo import gdal  # type: ignore
 
-def get_dem(bbox: str, out_dir: str) -> str:
+__version__ = "0.3.0"
+
+# Prevent the following warning from being printed to the console:
+# FutureWarning: Neither gdal.UseExceptions() nor gdal.DontUseExceptions()
+# has been explicitly called. In GDAL 4.0, exceptions will be enabled by
+# default.
+gdal.UseExceptions()
+
+
+def logtime(func):
+    """Function decorator to log the time (seconds) a function takes to execute."""
+    def wrapper(*args, **kwargs):
+        start = time()
+        result = func(*args, **kwargs)
+        print(f"Function {func.__name__} took {time() - start:.1f} seconds")
+        return result
+
+    return wrapper
+
+
+@logtime
+def get_dem(bbox: list[float], out_dir: str) -> str:
     """
-    Generate a COP DEM Gtiff for the given bounding box.
-    
+    Generate a COP DEM Gtiff for a bounding box.
+
     Parameters
     ----------
-    bbox : str
-        lat/lon bounding box, with orientation: [left  bottom  right top].
-        Example: '-156 18.8 -154.7 20.3'.
-    out_dir : str
-        Path to an existing directory to store the generated DEM Gtiff in.
-        
+    bbox
+        lat/lon bounding box, with orientation: left, bottom, right, top.
+        Example: [-156, 18.8, -154.7, 20.3]
+    out_dir
+        Path to an existing directory to write the generated DEM GeoTIFF to.
+
     Returns
     -------
-    dem_file : str
-        Filepath to the generated DEM Gtiff.
+    dem_file
+        Filepath to the generated DEM GeoTIFF.
         In practise, this will be: "<out_dir>/dem.tif"
     """
-
     dem_file = os.path.join(out_dir, "dem.tif")
+    sardem_command = " ".join(
+        (
+            "sardem",
+            f"--bbox {' '.join(map(str, bbox))}",
+            f"--output {dem_file}",
+            "--output-format GTiff",
+            "--data-source COP",
+        )
+    )
 
-    # Annoyingly, rasterio cannot find the PROJ_DATA directory
-    # when running in the NASA MAAP ADE.
-    # So, we need to manually set the environment variable, and
-    # then run sardem
-
-    # Step 1: Get the path to PROJ_DATA.
-    #     From Command Line, use the command: echo $PROJ_DATA
-    #     Example outputs:
-    #       In conda base environment in MAAP ADE, this produces: /opt/conda/share/proj
-    #       In a custom conda environment named 'dem', this produces: '/opt/conda/envs/dem/share/proj'
-    result = subprocess.run(['echo $PROJ_DATA'], stdout=subprocess.PIPE, shell=True)
-    proj_data_path = result.stdout.decode('utf-8').strip()
-    
-    os.environ['PROJ_DATA'] = proj_data_path
-    
-    # Step 2: Run sardem
-    start = time()
-    
-    os.system(f"sardem --bbox {bbox} --data-source COP -o {dem_file} --output-format GTiff")
-    
-    print(f"Time to fetch and create dem.tif: {time()-start} seconds")
-
-    # Warning: in a Jupyter notebook on NASA MAAP ADE, Steps 1 and 2 must be combined:
-    #     !PROJ_DATA={proj_data_path} sardem --bbox {bbox} --data-source COP -o {dem_file} --output-format GTiff
-    
+    if exit_code := os.system(sardem_command):
+        sys.exit(exit_code)
 
     return dem_file
 
-def do_computations(dem_file: str) -> None:
+
+@logtime
+def read_dem_as_array(dem_file: str) -> np.ndarray:
+    """Read a DEM file as a numpy array.
+
+    Parameters
+    ----------
+    dem_file
+        Filepath to the DEM GeoTIFF to read.
+
+    Returns
+    -------
+    dem
+        The DEM as a numpy array.
+    """
+    ds: gdal.Dataset
+
+    with gdal.Open(dem_file) as ds:
+        band: gdal.Band = ds.GetRasterBand(1)
+        dem: np.ndarray | None = band.ReadAsArray()
+
+    assert dem is not None, "DEM is None"
+
+    return dem
+
+
+@logtime
+def do_computations(dem: np.ndarray) -> None:
     """
     Open the DEM raster and do compute-intensive, multicore computations.
 
     This function produces no meaningful output, and does NOT
-    modify the dem file. What it does do is exercise the underlying
+    modify the dem file. What it does is exercise the underlying
     compute nodes by using the maximum number of CPUs allowed by BLAS,
     for an extended period of time, and using a significant amount of memory.
-    
-    By default, BLAS uses all available CPUs on a system.
-    To set this manually, from CLI use:
-        export OPENBLAS_NUM_THREADS = 20
-    
+
+    By default, BLAS uses all available CPUs on a system.  To set this manually,
+    set the environment variable ``OPENBLAS_NUM_THREADS`` to the number of
+    threads you want to use.
+
     Parameters
     ----------
-    dem_file : str
-        Filepath to the generated DEM Gtiff.
-        In practise, this will be: "<out_dir>/dem.tif"
+    dem
+        The DEM as a numpy array.
     """
-    # Read the DEM into a numpy array
-    ds = gdal.Open(dem_file)
-    dem = ds.GetRasterBand(1).ReadAsArray()
-    
-    # Truncate to make it a square array
-    min_edge = min(np.shape(dem))
-    dem = dem[:min_edge, :min_edge]
-    
-    print("Number of CPU cores available on instance: ", os.cpu_count())
-    
-    # Multi-core section:
-    start = time()
-    result = np.dot(np.linalg.inv(dem), dem)
-    print(f"Time to perform multicore computations: {time()-start} seconds")
+    print(f"Number of CPU cores available: {os.cpu_count()}")
+
+    # Make sure the array is square so we can compute the multiplicative inverse
+    square_dem = (
+        dem
+        if (min_edge := min(np.shape(dem))) == max(np.shape(dem))
+        else dem[:min_edge, :min_edge]
+    )
+
+    # Multi-core section
+    np.dot(np.linalg.inv(square_dem), square_dem)
 
 
-if __name__ == "__main__":
+def parse_args() -> argparse.Namespace:
+    """Parse the command-line arguments."""
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-v", "--version", action="version", version=__version__)
+    parser.add_argument(
+        "-c",
+        "--compute",
+        action=argparse.BooleanOptionalAction,
+        help="flag to crunch numbers, exercise multiple cores, and use a LOT of memory",
+        default=False,
+    )
+    parser.add_argument(
+        "--bbox",
+        type=float,
+        help="lat/lon bounding box (example: --bbox -156 18.8 -154.7 20.3)",
+        nargs=4,
+        metavar=("LEFT", "BOTTOM", "RIGHT", "TOP"),
+        required=True,
+    )
+    parser.add_argument(
+        "--output-dir",
+        dest="out_dir",
+        metavar="PATH",
+        type=str,
+        help="output directory to write DEM GeoTIFF to",
+        required=True,
+    )
+
+    return parser.parse_args()
+
+
+def main():
     """
-    Take a bounding box and output a geotiff DEM.
-    
+    Take a bounding box and output a GeoTIFF DEM.
+
     This is a thin wrapper around `sardem`: https://github.com/scottstanie/sardem
-    
+
     This script is meant test the MAAP processing pipeline; it is
     hardcoded to fetch the Copernicus DEM from the AWS Open Data registry.
     See: https://registry.opendata.aws/copernicus-dem/
-    
+
     The code will fetch the necessary DEM tiles, stitch them together with GDAL,
     and create a single geotiff DEM in the `out_dir` directory, named `dem.tif`.
 
@@ -109,40 +170,25 @@ if __name__ == "__main__":
     on that DEM raster. There are no changes made to the dem.tif; this command
     is simply for benchmarking compute.
 
-    Example cmd line call:
-    python get_dem.py 
-        --bbox -156 18.8 -154.7 20.3  # bounding box: [left  bottom  right top]
-        --out_dir output
+    Example command-line calls:
 
-    python get_dem.py 
-        --bbox -156 18.8 -154.7 20.3  # bounding box: [left  bottom  right top]
-        --compute  # flag to have the compute node perform intense, multi-core computations
-        --out_dir output
+        # bounding box: left bottom right top
+        python get_dem.py --bbox -156 18.8 -154.7 20.3 --output-dir output
+
+        # --compute will perform intense, multi-core computations
+        python get_dem.py --bbox -156 18.8 -154.7 20.3 --compute --output-dir output
     """
-    # Set up and aws permissions to public bucket (copied from iscesat2_boreal product)
-    os.environ['AWS_NO_SIGN_REQUEST'] = 'YES'
-
     # Step 1: Parse Arguments
-    parser = argparse.ArgumentParser()
+    args = parse_args()
 
-    parser.add_argument("-v", "--version", action="version", version=__version__)
-    
-    msg = "lat/lon bounding box, with orientation: [left  bottom  right top]. Example: '--bbox -156 18.8 -154.7 20.3'."
-    parser.add_argument("-b", "--bbox", type=str, help=msg, nargs=4)
-
-    msg = "Flag to crunch numbers, exercise multiple cores, and use a LOT of memory."
-    parser.add_argument("-c", "--compute", action='store_true', help=msg)  # default to False
-
-    msg = "Path for an existing output directory. The output DEM geotiff will be saved in here."
-    parser.add_argument("-o", "--out_dir", type=str, help=msg)
-    
-    args = parser.parse_args()
-    
-    bbox = " ".join(args.bbox)
-    
     # Step 2: Make dem.tif
-    dem_file = get_dem(bbox, args.out_dir)
-    
+    os.makedirs(args.out_dir, exist_ok=True)
+    dem_file = get_dem(args.bbox, args.out_dir)
+
     # Step 3: Perform compute-intensive, multicore operations
     if args.compute:
-        do_computations(dem_file)
+        do_computations(read_dem_as_array(dem_file))
+
+
+if __name__ == "__main__":
+    main()

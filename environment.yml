@@ -1,0 +1,9 @@
+name: dem
+channels:
+  - conda-forge
+  - nodefaults  # force everything to come from conda-forge channel
+dependencies:
+  - python~=3.11.0
+  - gdal~=3.4
+  - sardem~=0.11  # to download and crop the Copernicus DEM
+  - scalene~=1.5  # to profile the code

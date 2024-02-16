@@ -2,4 +2,7 @@
 
 set -eou pipefail
 
-conda env update --solver libmamba "$@"
+basedir=$(dirname "$(readlink -f "$0")")
+
+set -x  # echo on
+conda env update --solver libmamba --file "${basedir}"/environment.yml "$@"

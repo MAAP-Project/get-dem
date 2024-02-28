@@ -3,7 +3,7 @@ algorithm_description: Fetch DEM tiles within a bounding box from the Copernicus
   single GeoTIFF DEM at 'output/dem.tif', and optionally perform intense,
   multi-core computations, profiled with the Scalene profiler.
 algorithm_name: GET-DEM
-algorithm_version: scalene
+algorithm_version: 0.2.0
 repository_url: https://github.com/MAAP-Project/get-dem.git
 docker_container_url: mas.maap-project.org/root/maap-workspaces/base_images/vanilla:v3.1.4
 disk_space: 20GB

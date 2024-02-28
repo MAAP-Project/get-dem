@@ -6,7 +6,7 @@ from time import time
 import numpy as np
 from osgeo import gdal  # type: ignore
 
-__version__ = "0.3.0"
+__version__ = "0.2.0"
 
 # Prevent the following warning from being printed to the console:
 # FutureWarning: Neither gdal.UseExceptions() nor gdal.DontUseExceptions()

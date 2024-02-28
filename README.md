@@ -14,7 +14,7 @@ The source DEM is hardcoded to be the Copernicus DEM, which is fetched from the
 AWS Open Data registry.  See: <https://registry.opendata.aws/copernicus-dem/>
 
 The code will fetch the necessary DEM tiles, stitch them together with GDAL, and
-create a single GeoTIFF DEM in the `out_dir` directory, named `dem.tif`.
+create a single GeoTIFF DEM, named `dem.tif`, in the output directory.
 
 If the `--compute` flag is included, it will open the generated file and do
 compute-intensive, multi-core linear algebra computations on that DEM raster.

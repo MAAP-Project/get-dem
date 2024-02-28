@@ -4,5 +4,9 @@ channels:
   - nodefaults  # force everything to come from conda-forge channel
 dependencies:
   - black~=24.1  # to format the code
+  - ipykernel  # to use the conda environment in Jupyter
   - isort~=5.13  # to sort the imports
   - mypy~=1.8  # to check the types
+  - pip~=24.0
+  - pip:
+    - git+https://github.com/MAAP-Project/maap-py.git@develop

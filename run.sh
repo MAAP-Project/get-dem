@@ -24,20 +24,18 @@ function usage() {
     stderr "  compute   (optional) Flag to perform compute-intensive,"
     stderr "            multi-core linear algebra computations on the"
     stderr "            DEM raster, for benchmarking compute.  To enable, pass"
-    stderr "            any non-empty value.  Otherwise, pass '' to disable."
+    stderr "            any truthy value (case-insensitive): true, yes, on, or 1."
+    stderr "            Otherwise, pass '' or any non-truthy value to disable."
     stderr "  scalene_args"
     stderr "            (optional) Arguments to pass to the 'scalene' profiler."
-    stderr "            To accept the default arguments (see below), pass ''."
-    stderr "            Otherwise, pass the desired arguments as a single string"
-    stderr "            enclosed in quotes."
+    stderr "            Pass the desired arguments as a single string enclosed"
+    stderr "            in quotes. Example: '--json --outfile output/profile.json'"
     stderr ""
-    stderr "            Example: '--reduced-profile --cpu-only'"
-    stderr ""
-    stderr "            NOTE: Any arguments specified will NOT replace the default"
-    stderr "            arguments, with the exception of --column-width, but will"
-    stderr "            have the default arguments appended to them, like so:"
-    stderr ""
-    stderr "            '--column-width 200 [scalene_args] --cli --html --no-browser --outfile profile.html'"
+}
+
+function parse_flag() {
+    # If the first argument is "truthy" (case-insensitive), echo the second argument.
+    [[ ${1,,} =~ true|yes|on|1 ]] && echo "${2}" || echo ""
 }
 
 function parse_args() {
@@ -60,17 +58,12 @@ function parse_args() {
     IFS=' ' read -r -a bbox <<<"${1}"
 
     # arg 2: compute flag
-    # If the second argument is any non-empty value, set the compute flag
-    compute_flag=${2:+--compute}
+    # If the second argument is any "truthy" value, include the compute flag
+    compute_flag=$(parse_flag "${2}" "--compute")
 
     # arg 3: scalene_args
     # Split the scalene_args string into an array of values
     IFS=' ' read -r -a scalene_args <<<"${3}"
-    scalene_args=(
-        "${scalene_args[@]}"
-        --outfile "${output_dir}/profile.html"
-        --no-browser
-    )
 }
 
 # Get path to the directory containing this script
@@ -78,8 +71,8 @@ basedir=$(dirname "$(readlink -f "$0")")
 
 # Per NASA MAAP DPS convention, all outputs MUST be written under a directory
 # named 'output' relative to the current working directory.  Once the DPS job
-# finishes, MAAP will copy everything from 'output' to a directory in
-# 'my-public-bucket'. Everything else on the instance will be destroyed.
+# finishes, MAAP will copy everything from 'output' to a directory under
+# 'my-private-bucket/dps_output'. Everything else on the instance will be lost.
 output_dir="${PWD}"/output
 
 parse_args "$@"

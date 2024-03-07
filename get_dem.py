@@ -1,10 +1,10 @@
 import argparse
 import os
-import sys
 from time import time
 
 import numpy as np
 from osgeo import gdal  # type: ignore
+from sardem import cop_dem  # type: ignore
 
 __version__ = "0.2.0"
 
@@ -17,6 +17,7 @@ gdal.UseExceptions()
 
 def logtime(func):
     """Function decorator to log the time (seconds) a function takes to execute."""
+
     def wrapper(*args, **kwargs):
         start = time()
         result = func(*args, **kwargs)
@@ -46,18 +47,7 @@ def get_dem(bbox: list[float], out_dir: str) -> str:
         In practise, this will be: "<out_dir>/dem.tif"
     """
     dem_file = os.path.join(out_dir, "dem.tif")
-    sardem_command = " ".join(
-        (
-            "sardem",
-            f"--bbox {' '.join(map(str, bbox))}",
-            f"--output {dem_file}",
-            "--output-format GTiff",
-            "--data-source COP",
-        )
-    )
-
-    if exit_code := os.system(sardem_command):
-        sys.exit(exit_code)
+    cop_dem.download_and_stitch(dem_file, bbox, output_format="GTiff")
 
     return dem_file
 

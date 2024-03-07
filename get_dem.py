@@ -1,5 +1,7 @@
 import argparse
+import logging
 import os
+from functools import wraps
 from time import time
 
 import numpy as np
@@ -14,14 +16,26 @@ __version__ = "0.2.0"
 # default.
 gdal.UseExceptions()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(name)s] [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
+# Remove the sardem logging handler so we can control the output, because the
+# cop_dem module adds its own handler (poor practice for a library to do).
+logging.getLogger("sardem").handlers.clear()
+logger = logging.getLogger("get_dem")
+
 
 def logtime(func):
     """Function decorator to log the time (seconds) a function takes to execute."""
 
+    @wraps(func)
     def wrapper(*args, **kwargs):
         start = time()
         result = func(*args, **kwargs)
-        print(f"Function {func.__name__} took {time() - start:.1f} seconds")
+        logger.info("%s: %.1f seconds", func.__name__, time() - start)
         return result
 
     return wrapper
@@ -142,6 +156,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+@logtime
 def main():
     """
     Take a bounding box and output a GeoTIFF DEM.

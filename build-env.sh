@@ -20,11 +20,11 @@ while ((${#})); do
 done
 
 set -x # echo on
-PIP_REQUIRE_VENV=0 conda env update --prune --solver libmamba --file "${basedir}"/environment.yml "$@"
+PIP_REQUIRE_VENV=0 conda env update --quiet --prune --solver libmamba --file "${basedir}"/environment.yml "$@"
 set +x # echo off
 
 if [ "${dev}" -eq 1 ]; then
     set -x # echo on
-    PIP_REQUIRE_VENV=0 conda env update --solver libmamba --file "${basedir}"/environment-dev.yml "$@"
+    PIP_REQUIRE_VENV=0 conda env update --quiet --solver libmamba --file "${basedir}"/environment-dev.yml "$@"
     set +x # echo off
 fi

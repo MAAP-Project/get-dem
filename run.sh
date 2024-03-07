@@ -67,11 +67,8 @@ function parse_args() {
     # Split the scalene_args string into an array of values
     IFS=' ' read -r -a scalene_args <<<"${3}"
     scalene_args=(
-        --column-width 200
         "${scalene_args[@]}"
-        --cli
-        --html
-        --outfile "${output_dir}"/profile.html
+        --outfile "${output_dir}/profile.html"
         --no-browser
     )
 }

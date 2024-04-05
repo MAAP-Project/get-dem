@@ -1,0 +1,10 @@
+name: dem
+channels:
+  - conda-forge
+  - nodefaults  # force everything to come from conda-forge channel
+dependencies:
+  - conda >= 24.0
+  - gdal >= 3.4.2
+  - python >= 3.11
+  - sardem  # to download and crop the Copernicus DEM
+  - scalene >= 1.5

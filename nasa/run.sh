@@ -18,7 +18,6 @@ basedir=$(dirname "$(dirname "$(readlink -f "$0")")")
 # 'my-private-bucket/dps_output'. Everything else on the instance will be lost.
 outdir="${PWD}/output"
 
-# - `sardem` requires `HOME` to be set, so if it is not set, set it to `/home/ops`.
 # - The environment.yaml file sets up a custom conda environment called `dem`,
 #   so we use `conda run` to run the script in that environment.
 # - Use `scalene` to profile the script and write the output to `profile.json`.
@@ -35,7 +34,6 @@ outdir="${PWD}/output"
 #     get_dem.py --bbox "-156 18.8 -154.7 20.3" --out_dir /path/to/output
 #
 # shellcheck disable=SC2086
-AWS_NO_SIGN_REQUEST=YES HOME=${HOME:-/home/ops} \
-    "${CONDA_EXE:-conda}" run --live-stream --name dem \
-    scalene --json --outfile "${outdir}/profile.json" --- \
-    "${basedir}/get_dem.py" ${compute} --bbox ${bbox} --out_dir "${outdir}"
+"${CONDA_EXE:-conda}" run --live-stream --name dem \
+    python -m scalene --no-browser --json --outfile "${outdir}/profile.json" --- \
+    "${basedir}/get_dem.py" -o "${outdir}" --bbox ${bbox} ${compute}

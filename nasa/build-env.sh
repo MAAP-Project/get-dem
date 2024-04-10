@@ -11,7 +11,7 @@ PIP_REQUIRE_VENV=0 "${conda}" env update --quiet --prune --solver libmamba \
 if [ "${1:-}" == "--dev" ]; then
     # Install development dependencies
     PIP_REQUIRE_VENV=0 "${conda}" env update --quiet --solver libmamba \
-        --name dem --file "${basedir}"/environment-dev.yml
+        --name dem --file "${basedir}/nasa/environment-dev.yml"
     # Install the kernel for Jupyter
     "${conda}" run --name dem \
         python -Xfrozen_modules=off -m ipykernel install \

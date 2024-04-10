@@ -97,10 +97,10 @@ def read_dem_as_array(dem_file: str) -> np.ndarray:
 @logtime
 def do_computations(dem: np.ndarray) -> None:
     """
-    Open the DEM raster and do compute-intensive, multicore computations.
+    Perform multicore, compute-intensive computations on input raster.
 
     This function produces no meaningful output, and does NOT
-    modify the dem file. What it does is exercise the underlying
+    modify the input raster. What it does is exercise the underlying
     compute nodes by using the maximum number of CPUs allowed by BLAS,
     for an extended period of time, and using a significant amount of memory.
 
@@ -145,6 +145,7 @@ def parse_args() -> Args:
         required=True,
     )
     parser.add_argument(
+        "-o",
         "--out_dir",
         dest="out_dir",
         metavar="PATH",

@@ -1,6 +1,6 @@
 # Scalene produces SIGSEGV on the alpine-normal-3.8.2 image, so we use the
 # ubuntu-small-3.8.2 image instead, which actually produces a smaller image.
-FROM ghcr.io/osgeo/gdal:ubuntu-small-3.8.2
+FROM ghcr.io/osgeo/gdal:ubuntu-small-3.8.5
 
 # Update package lists and install necessary packages
 # g++ is required for installing a recent version of scalene from source since

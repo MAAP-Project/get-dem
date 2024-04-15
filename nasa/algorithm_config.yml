@@ -1,7 +1,8 @@
 algorithm_description: Fetch DEM tiles within a bounding box from the Copernicus
   DEM in the AWS Open Data registry, stitch them together with GDAL, create a
   single GeoTIFF DEM named 'dem.tif', and optionally perform intense, multi-core
-  computations, profiled with the Scalene profiler.
+  computations. Algorithm is profiled with Scalene profiler and
+  results saved to 'profile.json'.
 algorithm_name: get-dem
 algorithm_version: 0.2.0
 repository_url: https://github.com/MAAP-Project/get-dem.git

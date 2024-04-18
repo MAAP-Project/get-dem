@@ -3,6 +3,7 @@ import json
 import time
 from typing import List
 import configparser
+import os
 
 class MaapProcess(object):
 
@@ -12,10 +13,11 @@ class MaapProcess(object):
 
 class MaapJob(object):
 
-    def __init__(self,p_id:str, job_id:str) -> None:
+    def __init__(self,p_id:str, job_id:str, dps_name:str) -> None:
         self.p_id = p_id
         self.job_id = job_id
         self.status = "NONE"
+        self.dps_name = dps_name
 
 class MaapWPST(object):
 
@@ -68,10 +70,11 @@ class MaapWPST(object):
             if 'jobId' in res_json:
                 print(response.json())
                 job_id = response.json()['jobId']
+                dps_name  = response.json()['message'].split('/')[-1]
         else:
             print("ERROR : Can not launch job for process :"+title+" !")
 
-        return MaapJob(p_id,job_id)
+        return MaapJob(p_id,job_id,dps_name)
     
     def wait_for_final_status(self, maap_job):        
         job_status = 'RUNNING'
@@ -81,7 +84,7 @@ class MaapWPST(object):
             response = requests.get(self.copa_backend_url+'wpst/processes/{}/jobs/{}'.format(maap_job.p_id, maap_job.job_id),
                                     headers = {'Authorization': 'Bearer '+ self.oauth_token})
             job_status = json.loads(response.content).get('status')
-            print(job_status)
+            #print(job_status)
             time.sleep(30)
 
         maap_job.status = job_status
@@ -94,6 +97,8 @@ class MaapWPST(object):
                                headers = {'Authorization': 'Bearer '+ self.oauth_token})
             json_res = json.loads(result_proc.content)
             
+            os.makedirs(out_dir)
+            
             if 'outputs' in json_res:
                 for out in json_res['outputs']:
                     name = out['href'].split('?')[0].split('/')[-1]
@@ -103,5 +108,13 @@ class MaapWPST(object):
     def delete_job(self,maap_job):
         requests.delete('{}wpst/processes/{}/jobs/{}'.format(self.copa_backend_url, maap_job.p_id, maap_job.job_id),
                         headers = {'Authorization': 'Bearer '+ self.oauth_token})
+        
+    def get_monitoring(self):
+        """ Returns the monitoring info for the users"""
+        result_proc = requests.get('{}wpst/processes/monitor'.format(self.copa_backend_url), 
+                               headers = {'Authorization': 'Bearer '+ self.oauth_token})
+        json_res = json.loads(result_proc.content)
+        return json_res
+
 
         

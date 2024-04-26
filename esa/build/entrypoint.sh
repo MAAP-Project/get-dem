@@ -24,7 +24,7 @@ mkdir -p "${outdir}"
 cd /projects
 
 # shellcheck disable=SC2086
-python -m scalene --no-browser --json --outfile "${outdir}/profile.json" --- \
+python -m scalene --cli --json --outfile "${outdir}/profile.json" --- \
     /opt/get-dem/get_dem.py -o /projects/data/output --bbox ${BBOX} ${DO_COMPUTE}
 
 find "${outdir}" -type f

@@ -35,5 +35,5 @@ outdir="${PWD}/output"
 #
 # shellcheck disable=SC2086
 "${CONDA_EXE:-conda}" run --live-stream --name dem \
-    python -m scalene --no-browser --json --outfile "${outdir}/profile.json" --- \
+    python -m scalene --cli --json --outfile "${outdir}/profile.json" --- \
     "${basedir}/get_dem.py" -o "${outdir}" --bbox ${bbox} ${compute}

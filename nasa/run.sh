@@ -37,3 +37,6 @@ outdir="${PWD}/output"
 "${CONDA_EXE:-conda}" run --live-stream --name dem \
     python -m scalene --cli --json --outfile "${outdir}/profile.json" --- \
     "${basedir}/get_dem.py" -o "${outdir}" --bbox ${bbox} ${compute}
+
+"${CONDA_EXE:-conda}" run --live-stream --name dem \
+    python "${basedir}/simplify_profile.py" -o "${outdir}"

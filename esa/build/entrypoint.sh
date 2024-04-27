@@ -25,6 +25,8 @@ cd /projects
 
 # shellcheck disable=SC2086
 python -m scalene --cli --json --outfile "${outdir}/profile.json" --- \
-    /opt/get-dem/get_dem.py -o /projects/data/output --bbox ${BBOX} ${DO_COMPUTE}
+    /opt/get-dem/get_dem.py -o "${outdir}" --bbox ${BBOX} ${DO_COMPUTE}
+
+python /opt/get-dem/simplify_profile.py -o "${outdir}"
 
 find "${outdir}" -type f

@@ -68,3 +68,5 @@ creates a directory named `output` and writes the following files there:
   main functions of the algorithm
 - `profile.json`: detailed profiling metrics captured by
   [Scalene](https://github.com/plasma-umass/scalene)
+- `simple_profile.json`: minimal set of profile metrics pulled from
+  `elapsed.json` and `profile.json`

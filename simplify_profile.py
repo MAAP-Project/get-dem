@@ -6,11 +6,11 @@ from typing import Any
 
 def simplify_profile(scalene_profile: Any, function_timings: Any) -> Any:
     return {
-        "max_footpring_mb": scalene_profile["max_footprint_mb"],
+        "max_footprint_mb": scalene_profile["max_footprint_mb"],
         "total_elapsed_sec": scalene_profile["elapsed_time_sec"],
         "download_and_stitch_sec": function_timings.get("get_dem", 0)
         + function_timings.get("read_dem_as_array", 0),
-        "comput_sec": function_timings.get("do_computations", 0),
+        "compute_sec": function_timings.get("do_computations", 0),
     }
 
 

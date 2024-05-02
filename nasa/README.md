@@ -8,11 +8,10 @@ have a `mamba` variant installed, replace `conda` with the appropriate variant
 in the following commands):
 
 ```plain
-conda env update
+nasa/build-env.sh --dev
 ```
 
-Next, you must activate the environment (which defaults to `dem`, if not
-overridden with the `-n/--name` option in the previous command):
+Next, you must activate the environment:
 
 ```plain
 conda activate dem

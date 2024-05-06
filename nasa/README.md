@@ -8,7 +8,7 @@ have a `mamba` variant installed, replace `conda` with the appropriate variant
 in the following commands):
 
 ```plain
-nasa/build-env.sh --dev
+nasa/build-dev.sh
 ```
 
 Next, you must activate the environment:

@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  hello_world_job:
+  build_ogc_app_pack:
     runs-on: ubuntu-latest
-    name: Test job
+    name: Build OGC Application Package
     steps:
       - uses: actions/checkout@v4
       - id: ogc_app_pack_generator_action

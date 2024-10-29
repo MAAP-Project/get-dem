@@ -1,0 +1,12 @@
+on: [push]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: Test job
+    steps:
+      - uses: actions/checkout@v4
+      - id: foo
+        uses: MAAP-Project/ogc-app-pack-generator@54c4a7e0e1abaa34f8bf7c3a4da1f755360548ec
+        with:
+          algorithm-config: 'nasa_algo_config'

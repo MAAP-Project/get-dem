@@ -1,0 +1,17 @@
+on:
+  push:
+    branches:
+      - feature/ogc-action
+  workflow_dispatch:
+
+jobs:
+  build_ogc_app_pack:
+    runs-on: ubuntu-latest
+    name: Build OGC Application Package
+    steps:
+      - uses: actions/checkout@v4
+      - id: ogc_app_pack_generator_action
+        uses: MAAP-Project/ogc-app-pack-generator@feature/create-action
+        with:
+          algorithm-config-path: 'nasa/algorithm_config.yml'
+          github-token: ${{ secrets.GITHUB_TOKEN }}

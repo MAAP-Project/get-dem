@@ -6,7 +6,7 @@ jobs:
     name: Test job
     steps:
       - uses: actions/checkout@v4
-      - id: foo
-        uses: MAAP-Project/ogc-app-pack-generator@54c4a7e0e1abaa34f8bf7c3a4da1f755360548ec
+      - id: Run 'ogc-app-pack-generator' action
+        uses: MAAP-Project/ogc-app-pack-generator@a050eb69037f5aada0c54ebbdec11480097094a9
         with:
-          algorithm-config: 'nasa_algo_config'
+          algorithm-config-dir: 'nasa/algorithm_config.yml'

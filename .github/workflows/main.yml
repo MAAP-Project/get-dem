@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: ogc_app_pack_generator_action
-        uses: MAAP-Project/ogc-app-pack-generator@3f5a5809b895a9c02990ea0c2b04a96bb78bee66
+        uses: MAAP-Project/ogc-app-pack-generator@feature/create-action
         with:
           algorithm-config-path: 'nasa/algorithm_config.yml'
           github-token: ${{ secrets.GITHUB_TOKEN }}

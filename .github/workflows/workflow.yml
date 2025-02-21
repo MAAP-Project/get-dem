@@ -1,0 +1,18 @@
+on:
+  push:
+    branches:
+      - mlucas/ogc
+jobs:
+  build_app_pack:
+    environment: DIT
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo content
+        uses: actions/checkout@v4
+
+      - name: Use OGC App Pack Generator Action
+        uses: MAAP-Project/ogc-app-pack-generator@feature/create-action
+        with:
+          # Specify action inputs
+          workflow-configuration-path: nasa/workflow_configuration.yml
+          dockerfile-path: get-dem/esa/Dockerfile

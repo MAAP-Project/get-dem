@@ -15,4 +15,4 @@ jobs:
         with:
           # Specify action inputs
           algorithm-configuration-path: nasa/algorithm_config.yml
-          dockerfile-path: get-dem/esa/Dockerfile
+          dockerfile-path: esa/Dockerfile

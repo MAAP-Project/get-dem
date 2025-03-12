@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write
       packages: write
-      
+
     steps:
       - name: Checkout repo content
         uses: actions/checkout@v4

@@ -1,25 +1,30 @@
-algorithm_description: Fetch DEM tiles within a bounding box from the Copernicus
-  DEM in the AWS Open Data registry, stitch them together with GDAL, create a
-  single GeoTIFF DEM named 'dem.tif', and optionally perform intense, multi-core
-  computations. Algorithm is profiled with Scalene profiler and
-  results saved to 'profile.json'.
+# Input params for OGC application package generator
+# The information provided in this file supports CWL and OGC best practices
+algorithm_description: This is a wrapper for the sardem-sarsen algorithm to exercise the MAAP processing pipeline.
 algorithm_name: get-dem
-algorithm_version: develop
-repository_url: https://github.com/MAAP-Project/get-dem.git
-docker_container_url: mas.maap-project.org/root/maap-workspaces/base_images/vanilla:v3.1.4
-disk_space: 20GB
-queue: maap-dps-worker-32gb
-build_command: get-dem/nasa/build-dps.sh
-run_command: get-dem/nasa/run.sh
+algorithm_version: mlucas/ogc
+keywords: ogc, sar
+code_repository: https://github.com/MAAP-Project/get-dem.git
+citation: https://github.com/MAAP-Project/get-dem.git
+author: mlucas
+contributor: mlucas
+license: https://github.com/MAAP-Project/get-dem/blob/develop/LICENSE
+release_notes: None
+run_command: /app/get-dem/nasa/run.sh
+ram_min: 5 # mebibytes
+cores_min: 1
+outdir_max: 20 # mebibytes
+
 inputs:
-  config: []
-  file: []
-  positional:
   - name: bbox
-    description: Bounding box as 'LEFT BOTTOM RIGHT TOP'
-    default: ''
-    required: true
+    doc: Bounding box as 'LEFT BOTTOM RIGHT TOP'
+    label: bounding box
+    type: string
   - name: compute
-    description: Flag to perform intense, multi-core computations (any non-empty value will enable this)
-    default: ''
-    required: false
+    doc: Flag to perform intense, multi-core computations (any non-empty value will enable this)
+    label: compute
+    type: string
+
+outputs:
+  - name: out
+    type: Directory

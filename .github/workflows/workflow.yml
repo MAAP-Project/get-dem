@@ -21,3 +21,4 @@ jobs:
           # Specify action inputs
           algorithm-configuration-path: nasa/algorithm_config.yml
           dockerfile-path: esa/Dockerfile
+          deploy-app-pack: true

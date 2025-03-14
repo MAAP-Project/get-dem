@@ -10,6 +10,7 @@ author: mlucas
 contributor: mlucas
 license: https://github.com/MAAP-Project/get-dem/blob/develop/LICENSE
 release_notes: None
+build_command: get-dem/nasa/build-dps.sh
 run_command: /app/get-dem/nasa/run.sh
 ram_min: 5 # mebibytes
 cores_min: 1

@@ -63,7 +63,7 @@ s:contributor:
   s:name: mlucas
 s:citation: https://github.com/MAAP-Project/get-dem.git
 s:codeRepository: https://github.com/MAAP-Project/get-dem.git
-s:dateCreated: 2025-03-14
+s:dateCreated: 2025-03-17
 s:license: https://github.com/MAAP-Project/get-dem/blob/develop/LICENSE
 s:softwareVersion: 1.0.0
 s:version: mlucas/ogc
